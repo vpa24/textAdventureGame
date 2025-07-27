@@ -25,11 +25,12 @@ public:
 class Player {
     public:
     string name;
-    int health = 300; // if occupied in dark room, health will be reduced 50 and if in light room, health will be increased 50
+    int health = 300; // Default health
     // Specification B2 - Add Combat
     int attackPower;
 };
 
+// Specification B3 - Put monsters in a Monster() class
 class Monster {
     public:
     string name;
@@ -37,24 +38,15 @@ class Monster {
     int damage;
 };
 
-// Specification B3 - Put monsters in a Monster() class
-Monster monsters[6] = {
-    {"Goblin", 90, 10},
-    {"Zombie", 80, 15},
-    {"Vampire", 60, 20},
-    {"Dragon", 70, 30},
-    // Specification A3 - Add more Monsters
-    {"Orc", 40, 25}
-};
 
 // Function Prototypes
 void ProgramGreeting();
 void displayInstructions();
 int firstRoomChoice();
 void displayRoom(Room* room);
-void spawnMonster(Room* room);
+void spawnMonster(Room* room, Monster* monsters);
 char getValidatedInput();
-void encounterMonster(Player* player, int monsterIndex);
+void encounterMonster(Player* player, int monsterIndex, Monster* monsters);
 void encounterRoom(Player* player, Room* room);
 int convertExittoDirection(char exitChar);
 void playGame(Player* player);
@@ -88,24 +80,32 @@ void playGame(Player* player)
         // Specification A2 - Add more rooms
         {6, "The Dungeon", "A devil room with eerie sounds.", 0, {0, 0, 0, 1}, rand() % 2 ? true : false, -1}};
 
-    
-    
+    // Specification B3 - Put monsters in a Monster() class
+    Monster monsters[6] = {
+        {"Goblin", 90, 10},
+        {"Zombie", 80, 15},
+        {"Vampire", 60, 20},
+        {"Dragon", 70, 30},
+        // Specification A3 - Add more Monsters
+        {"Orc", 40, 25}};
+
+
     int roomNumber = firstRoomChoice();
-    Room* roomChoicePtr = &rooms[roomNumber -1]; // Get the room object based on the user's choice
+    Room* roomChoicePtr = &rooms[roomNumber]; // Get the room object based on the user's choice
     // Specification C4 - Abbreviated Room Description
     displayRoom(roomChoicePtr);
-    // Spwan a monster in the chosen room
-    spawnMonster(roomChoicePtr); // Spawn a monster in the chosen room
+    // Spawn a monster in the chosen room
+    spawnMonster(roomChoicePtr, monsters); // Spawn a monster in the chosen room
 
     player->attackPower = 10;
-    encounterMonster(player, roomChoicePtr->monsterIndex);
+    encounterMonster(player, roomChoicePtr->monsterIndex, monsters);
     encounterRoom(player, roomChoicePtr); // Encounter the room's monster
 
             
 
     while (player->health > 0)
     {
-        cout << "\nYour Current Health: " << player->health << endl;
+        cout << "Your Current Health: " << player->health << endl;
         
         char choice = getValidatedInput();
         if(choice == 'L')
@@ -115,15 +115,16 @@ void playGame(Player* player)
             int dir = convertExittoDirection(choice);
             if (roomChoicePtr->exits[dir] == 0)
             {
-                cout << "You can't go that way!" << endl;
+                cout << "You can't go that way!";;
             }
             else
             {
-                roomNumber = roomChoicePtr->exits[dir]; // Move to the next room
+                roomNumber = roomChoicePtr->exits[dir];
                 roomChoicePtr = &rooms[roomNumber]; // Update the room pointer
-                spawnMonster(roomChoicePtr); // Spawn a monster in the new room
-                displayRoom(roomChoicePtr); // Display the new room info
-                encounterMonster(player, roomChoicePtr->monsterIndex); // Encounter the monster in the new room
+                spawnMonster(roomChoicePtr, monsters); // Spawn a monster in the new room
+                displayRoom(roomChoicePtr);
+                encounterMonster(player, roomChoicePtr->monsterIndex, monsters);
+                encounterRoom(player, roomChoicePtr);
             }
         }
     }
@@ -147,7 +148,7 @@ void ProgramGreeting()
     char buffer[80];
     strftime(buffer, sizeof(buffer), "%B %d, %Y", ltm); // %B = full month, %d = day, %Y = year
 
-    std::cout << "Today's day: " << buffer << std::endl;
+    cout << "Today's day: " << buffer << endl;
     cout << "**********************************************" << endl
             << endl
             << endl;
@@ -189,7 +190,7 @@ int firstRoomChoice()
             cout << "Invalid choice! Please enter a number between 1 and 6: ";
         }
     } while (roomChoice < 1 || roomChoice > 6);
-    return roomChoice; // Return room's ID
+    return roomChoice - 1; // Return room's ID
 }
 
 // Display room info
@@ -202,7 +203,7 @@ void displayRoom(Room* room)
     }
 }
 
-void spawnMonster(Room* room)
+void spawnMonster(Room* room, Monster* monsters)
 {
     Room& roomInfo = *room;
     int monsterIndex = rand() % 6;  // Randomly select a monster index
@@ -232,24 +233,24 @@ char getValidatedInput()
 }
 
 // Specification B1 - Add Combat (Monster deals 10 damage)
-void encounterMonster(Player* player, int monsterIndex)
+void encounterMonster(Player* player, int monsterIndex, Monster* monsters)
 {
 
-    cout << monsterIndex;
-    Monster* monster = &monsters[monsterIndex]; // Get the monster from monsterIndex
-    
-    player->health -= monster->damage;
-    monster->health -= player->attackPower;
-    cout << monster->name << " has only " << monster->health;
-    if (monster->health <= 0)
-    {
-        cout << "You defeated the " << monster->name << "!" << endl;
+    Monster& monster = monsters[monsterIndex]; // Get the monster from monsterIndex
+
+    player->health -= monster.damage;
+    monster.health -= player->attackPower;
+    if (monster.health <= 0) {
+        cout << "You defeated the " << monster.name << "!" << endl;
         cout << "Congratulations, " << player->name << "! You have won the game!" << endl;
         playAgain(player);
+    } else {
+        cout << "You attacked the " << monster.name << " and it has " << monster.health << " health left." << endl;
     }
+
     if (player->health <= 0)
     {
-        cout << "You have been defeated by the " << monster->name << "!" << endl;
+        cout << "You have been defeated by the " << monster.name << "!" << endl;
         playAgain(player);
     }
 }
@@ -274,6 +275,7 @@ void encounterRoom(Player* player, Room* room)
     }
 }
 
+// Specification A1 - User can play again
 void playAgain(Player* player) {
     char choice;
     do {
