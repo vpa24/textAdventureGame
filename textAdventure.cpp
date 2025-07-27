@@ -260,13 +260,13 @@ void encounterRoom(Player* player, Room* room)
 {
     if (room->LightorDark) // If the room is dark
     {
-        cout << "You are in a dark room. Your health is reduced by 20." << endl;
-        player->health -= 20;
+        cout << "You are in a dark room. Your health is reduced by 10." << endl;
+        player->health -= 10;
     }
     else // If the room is light
     {
-        cout << "You are in a light room. Your health is increased by 30." << endl;
-        player->health += 30;
+        cout << "You are in a light room. Your health is increased by 10." << endl;
+        player->health += 10;
     }
     
     if (player->health <= 0)
