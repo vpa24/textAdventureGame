@@ -49,6 +49,7 @@ char getValidatedInput();
 void encounterMonster(Player* player, int monsterIndex, Monster* monsters);
 void encounterRoom(Player* player, Room* room);
 int convertExittoDirection(char exitChar);
+void LKey(Room* room);
 void playGame(Player* player);
 void playAgain(Player* player);
 
@@ -105,17 +106,17 @@ void playGame(Player* player)
 
     while (player->health > 0)
     {
-        cout << "Your Current Health: " << player->health << endl;
         
         char choice = getValidatedInput();
         if(choice == 'L')
         {
-            displayRoom(roomChoicePtr);
+            LKey(roomChoicePtr);
         } else{
+            cout << "Your Current Health: " << player->health << endl;
             int dir = convertExittoDirection(choice);
             if (roomChoicePtr->exits[dir] == 0)
             {
-                cout << "You can't go that way!";;
+                cout << "You can't go that way!";
             }
             else
             {
@@ -304,4 +305,10 @@ int convertExittoDirection(char exitChar) {
         return 3;
     }
     return -1; // Invalid direction
+}
+
+// Specification C5 - Detailed Look
+void LKey(Room* room) {
+    cout << "You are in the room: " << room->name << endl;
+    cout << "Description: " << room->description << endl;
 }
