@@ -58,7 +58,7 @@ int main()
     srand(time(0));
     ProgramGreeting();
     displayInstructions();
-    
+
     // Specification C2 - Player Name
     Player* player = new Player;
     cout << "Please enter your name: ";
@@ -102,11 +102,11 @@ void playGame(Player* player)
     encounterMonster(player, roomChoicePtr->monsterIndex, monsters);
     encounterRoom(player, roomChoicePtr); // Encounter the room's monster
 
-            
+
 
     while (player->health > 0)
     {
-        
+
         char choice = getValidatedInput();
         if(choice == 'L')
         {
@@ -173,7 +173,7 @@ void displayInstructions()
     string input;
     do
     {
-        cout << "Press Enter to continue..." << endl;
+        cout << "Press Enter to start the game..." << endl;
         getline(cin, input);
     } while (!input.empty()); // keep looping until user presses only Enter
 }
@@ -233,7 +233,7 @@ char getValidatedInput()
     };
 }
 
-// Specification B1 - Add Combat (Monster deals 10 damage)
+// Specification B1 - Add Combat
 void encounterMonster(Player* player, int monsterIndex, Monster* monsters)
 {
 
@@ -268,7 +268,7 @@ void encounterRoom(Player* player, Room* room)
         cout << "You are in a light room. Your health is increased by 10." << endl;
         player->health += 10;
     }
-    
+
     if (player->health <= 0)
     {
         cout << "You have lost all your health! Game Over!" << endl;
