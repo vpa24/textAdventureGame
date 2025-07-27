@@ -116,7 +116,7 @@ void playGame(Player* player)
             int dir = convertExittoDirection(choice);
             if (roomChoicePtr->exits[dir] == 0)
             {
-                cout << "You can't go that way!";
+                cout << "You can't go that way!" << endl;
             }
             else
             {
